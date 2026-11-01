@@ -1,0 +1,17 @@
+*.gem
+/.bundle/
+/vendor/
+/pkg/
+/coverage/
+/tmp/
+/test/
+/tests/
+/Gemfile.lock
+__pycache__/
+*.pyc
+.env
+.env.*
+# Internal planning does not belong in a public SDK.
+**/[Tt][Oo][Dd][Oo]*
+**/[Bb][Aa][Cc][Kk][Ll][Oo][Gg]*
+**/[Rr][Oo][Aa][Dd][Mm][Aa][Pp]*

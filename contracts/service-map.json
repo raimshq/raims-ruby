@@ -1,0 +1,98 @@
+{
+  "accounts": {
+    "retrieve_fees": "GetAccountFees",
+    "retrieve_number": "GetAccountNumber",
+    "retrieve_checkout_settings": "GetCheckoutSettings",
+    "update_checkout_settings": "UpdateCheckoutSettings",
+    "create_checkout_logo_upload": "CreateCheckoutLogoUpload",
+    "create_checkout_favicon_upload": "CreateCheckoutFaviconUpload",
+    "delete_checkout_asset_upload": "DeleteCheckoutAssetUpload",
+    "retrieve_context": "GetAccountContext"
+  },
+  "balances": {
+    "retrieve": "GetBalance",
+    "forecast": "GetBalanceForecast"
+  },
+  "charges": {
+    "create": "CreateCharge",
+    "list": "ListCharges",
+    "retrieve": "GetCharge",
+    "update": "UpdateCharge",
+    "revoke": "RevokeCharge",
+    "retrieve_payment": "GetChargePayment",
+    "retrieve_receipt": "GetChargeReceipt",
+    "retrieve_boleto": "GetChargeBoleto",
+    "create_refund": "CreateRefund",
+    "list_refunds": "ListChargeRefunds",
+    "retrieve_refund_eligibility": "GetRefundEligibility",
+    "statistics": "GetChargeStatistics"
+  },
+  "customers": {
+    "create": "CreateCustomer",
+    "list": "ListCustomers",
+    "retrieve": "GetCustomer",
+    "update": "UpdateCustomer",
+    "delete": "DeleteCustomer",
+    "delete_batch": "DeleteCustomersBatch"
+  },
+  "disputes": {
+    "list": "ListDisputes",
+    "retrieve": "GetDispute"
+  },
+  "payment_links": {
+    "create": "CreatePaymentLink",
+    "list": "ListPaymentLinks",
+    "retrieve": "GetPaymentLink",
+    "update": "UpdatePaymentLink",
+    "send_email": "SendPaymentLinkEmail"
+  },
+  "refunds": {
+    "list": "ListRefunds",
+    "retrieve": "GetRefund",
+    "retrieve_receipt": "GetRefundReceipt"
+  },
+  "statements": {
+    "list": "ListStatements",
+    "retrieve": "GetStatement"
+  },
+  "webhook_event_types": {
+    "list": "ListWebhookEventTypes"
+  },
+  "webhooks": {
+    "create": "CreateWebhook",
+    "list": "ListWebhooks",
+    "retrieve": "GetWebhook",
+    "update": "UpdateWebhook",
+    "delete": "DeleteWebhook",
+    "retrieve_health": "GetWebhookHealth",
+    "set_pause": "SetWebhookPause",
+    "rotate_secret": "RotateWebhookSecret",
+    "test": "TestWebhook"
+  },
+  "withdrawal_destinations": {
+    "list": "ListWithdrawalDestinations",
+    "retrieve": "GetWithdrawalDestination"
+  },
+  "withdrawals": {
+    "create": "CreateWithdrawal",
+    "list": "ListWithdrawals",
+    "retrieve": "GetWithdrawal",
+    "retrieve_limits": "GetWithdrawalLimits",
+    "retrieve_summary": "GetWithdrawalSummary",
+    "retrieve_automatic_settings": "GetAutomaticWithdrawalSettings",
+    "update_automatic_settings": "UpdateAutomaticWithdrawalSettings"
+  },
+  "simulation_charges": {
+    "confirm_payment": "ConfirmSimulationPayment",
+    "fail_payment": "FailSimulationPayment",
+    "configure_scenario": "ConfigureSimulationScenario",
+    "resolve_scenario": "ResolveSimulationScenario",
+    "issue_payment": "IssueSimulationPayment",
+    "compensate_boleto": "CompensateSimulationBoleto",
+    "create_refund": "CreateSimulationRefund"
+  },
+  "simulation_refunds": {
+    "complete": "CompleteSimulationRefund",
+    "fail": "FailSimulationRefund"
+  }
+}

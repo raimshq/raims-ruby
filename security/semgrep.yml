@@ -1,0 +1,34 @@
+rules:
+  - id: raims.ruby.tls-validation-disabled
+    languages: [ruby]
+    severity: ERROR
+    message: Keep TLS certificate verification enabled.
+    pattern-either:
+      - pattern: $HTTP.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      - pattern: $HTTP.verify_mode = 0
+      - pattern: $HTTP.verify_hostname = false
+  - id: raims.ruby.transport-retries-enabled
+    languages: [ruby]
+    severity: ERROR
+    message: Keep automatic transport retries disabled; only the SDK loop retries reads.
+    patterns:
+      - pattern: $HTTP.max_retries = $VALUE
+      - pattern-not: $HTTP.max_retries = 0
+  - id: raims.ruby.dynamic-code
+    languages: [ruby]
+    severity: ERROR
+    message: Do not evaluate dynamic code in the SDK.
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: $OBJ.instance_eval($CODE)
+      - pattern: $OBJ.class_eval($CODE)
+  - id: raims.ruby.embedded-private-key
+    languages: [generic]
+    severity: ERROR
+    message: Load private keys from the application's secret store.
+    pattern-regex: '-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----[\s]+[A-Za-z0-9+/=]{32}'
+  - id: raims.ruby.embedded-github-token
+    languages: [generic]
+    severity: ERROR
+    message: Keep access tokens outside source files.
+    pattern-regex: '\b(?:gh[pousr]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{82})\b'
