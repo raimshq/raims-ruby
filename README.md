@@ -115,7 +115,6 @@ Services expose methods such as `create`, `retrieve`, `update`, `delete`, and
 - [Pagination](docs/pagination.md)
 - [Errors, idempotency, and retries](docs/errors-and-retries.md)
 - [Receiving webhooks](docs/webhooks.md)
-- [Maintenance and contract](docs/maintenance.md)
 - [Contributing](CONTRIBUTING.md) and [security](SECURITY.md)
 - [Public API](https://docs.raims.com/en/api)
 

@@ -15,8 +15,7 @@ gh release download --repo raimshq/raims-ruby --pattern raims.gem --pattern SHA2
 
 You can also download both assets from the releases page. The asset name
 `raims.gem` stays the same between releases; the gem metadata identifies its
-version. Consumers need Ruby and the gem, without Python or the engineering
-Toolkit.
+version.
 
 ## Verify the download
 
@@ -52,7 +51,7 @@ gem install ./raims-ruby-release/raims.gem
 RubyGems installs the local SDK artifact and resolves its declared dependencies
 through your configured gem sources. Load the library with `require 'raims'`.
 The gem contains the runtime library, public contract metadata, license, and
-README. Engineering scripts and reference sources remain in the repository.
+README.
 
 ## Use Bundler with release source
 
@@ -93,6 +92,5 @@ gem build raims.gemspec --output /path/to/artifacts/raims.gem
 gem install /path/to/artifacts/raims.gem
 ```
 
-The gemspec supplies the package version and dependencies. A successful build
-does not replace the engineering checks described in the
-[maintenance guide](maintenance.md#local-validation).
+The gemspec supplies the package version and dependencies. Run your application's
+integration checks against the rebuilt gem before deploying it.
