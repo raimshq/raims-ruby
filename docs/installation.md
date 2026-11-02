@@ -1,13 +1,35 @@
 # Installation and updates
 
-Requires Ruby 3.3 or later. Source code and the packaged gem are distributed
-through the [GitHub releases](https://github.com/raimshq/raims-ruby/releases/latest).
-The SDK is not yet published on RubyGems.
+Requires Ruby 3.3 or later. The official gem is
+[`raims` on RubyGems](https://rubygems.org/gems/raims). Installation resolves
+the gem's declared runtime dependencies. Load the SDK with `require 'raims'`.
 
-## Download the current release
+## Install with RubyGems
+
+Install the current stable version:
+
+```sh
+gem install raims
+```
+
+## Use Bundler
+
+Add the gem to your application's `Gemfile`:
+
+```ruby
+source 'https://rubygems.org'
+
+gem 'raims'
+```
+
+Run `bundle install` from the application directory. Keep the resulting
+`Gemfile.lock` with your application to retain its resolved versions.
+
+## GitHub release downloads
 
 Use GitHub CLI to download the gem and its checksum file from the current
-stable release into a new directory:
+stable [GitHub release](https://github.com/raimshq/raims-ruby/releases/latest)
+into a new directory:
 
 ```sh
 gh release download --repo raimshq/raims-ruby --pattern raims.gem --pattern SHA256SUMS --dir raims-ruby-release
@@ -40,7 +62,7 @@ Get-FileHash -Algorithm SHA256 -LiteralPath ./raims-ruby-release/raims.gem
 Stop if the hashes differ. Checksums detect changed files; the official
 repository, release tag, and commit establish which source you are installing.
 
-## Install the gem
+## Install a GitHub download
 
 Run this command from the directory containing `raims-ruby-release`:
 
@@ -74,10 +96,24 @@ lockfile.
 
 ## Update an existing installation
 
-Download the current stable release into a new directory, verify its hash,
-and install the new `raims.gem` as above. Review the release notes and test
-your integration before deployment. The download selects the current release
-at that moment; future updates are not applied automatically.
+For an installation managed by RubyGems:
+
+```sh
+gem update raims
+```
+
+For a Bundler application:
+
+```sh
+bundle update raims
+```
+
+Review the release notes and test your integration before deployment. Keep
+the updated lockfile with your application. Installing a release does not
+apply future updates automatically.
+
+For a GitHub installation, download the current stable release into a new
+directory, verify its hash, and install the new `raims.gem` as above.
 
 For a Bundler path installation, extract the new release source, update the
 Gemfile path if needed, and run `bundle update raims`. Keep the resulting

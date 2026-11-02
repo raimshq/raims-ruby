@@ -9,12 +9,12 @@ Gem::Specification.new do |spec|
   spec.email = ['security@raims.com']
   spec.summary = 'Official Ruby SDK for the Raims public API.'
   spec.description = 'Use the Raims public API from Ruby applications with resource services, cursor pagination, structured errors, and webhook signature verification.'
-  spec.homepage = 'https://docs.raims.com/en/api'
+  spec.homepage = 'https://docs.raims.com/en/integracoes/sdk-ruby'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.3'
   spec.metadata = {
     'source_code_uri' => 'https://github.com/raimshq/raims-ruby',
-    'documentation_uri' => 'https://docs.raims.com/en/api',
+    'documentation_uri' => 'https://docs.raims.com/en/integracoes/sdk-ruby',
     'bug_tracker_uri' => 'https://github.com/raimshq/raims-ruby/issues',
     'rubygems_mfa_required' => 'true'
   }

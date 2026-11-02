@@ -1,0 +1,215 @@
+name: Validate Ruby SDK
+'on':
+  push:
+    branches:
+    - '**'
+  workflow_dispatch: null
+permissions:
+  contents: read
+concurrency:
+  group: raims-ruby-validation-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONOPTIMIZE: '0'
+  RAIMS_RUBY_TOOLKIT_REF: 239d5acaf5edade863551a391241c5f9567101bc
+jobs:
+  validateRuby:
+    name: validateRuby
+    if: github.repository == 'raimshq/raims-ruby'
+    runs-on:
+    - codebuild-raims-github-actions-${{ github.run_id }}-${{ github.run_attempt }}
+    - ruby-sdk-check
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Checkout the candidate commit
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        path: Raims-Ruby
+        persist-credentials: false
+    - name: Setup Python
+      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+      with:
+        python-version: 3.12.14
+    - name: Setup Ruby 3.3
+      id: ruby33
+      uses: ruby/setup-ruby@de492cf36cbab201753d720ce4f4e336cd688c94
+      with:
+        ruby-version: 3.3.13
+        rubygems: default
+        bundler: none
+        bundler-cache: false
+    - name: Setup Ruby 4.0
+      id: ruby40
+      uses: ruby/setup-ruby@de492cf36cbab201753d720ce4f4e336cd688c94
+      with:
+        ruby-version: 4.0.9
+        rubygems: default
+        bundler: none
+        bundler-cache: false
+    - name: Reject tracked files excluded by repository policy
+      run: |
+        import os
+        from pathlib import Path
+        import subprocess
+        import sys
+        checkout = Path(os.environ['GITHUB_WORKSPACE']) / 'Raims-Ruby'
+        ignored = subprocess.check_output([
+            'git', '-C', str(checkout), 'ls-files', '--cached', '--ignored',
+            '--exclude-from=.gitignore', '-z',
+        ])
+        count = sum(bool(path) for path in ignored.split(b'\0'))
+        if count:
+            print(f'Repository policy rejects {count} tracked ignored file(s).', file=sys.stderr)
+            raise SystemExit(1)
+      shell: python
+    - name: Create a read-only validation source token
+      id: sources
+      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+      with:
+        client-id: ${{ vars.RAIMS_CI_SOURCE_READER_CLIENT_ID }}
+        private-key: ${{ secrets.RAIMS_CI_SOURCE_READER_PRIVATE_KEY }}
+        owner: raimshq
+        repositories: Raims-Developer-Toolkit
+        permission-contents: read
+    - name: Checkout the reviewed validation tooling
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        repository: raimshq/Raims-Developer-Toolkit
+        ref: ${{ env.RAIMS_RUBY_TOOLKIT_REF }}
+        path: Developer-Toolkit
+        token: ${{ steps.sources.outputs.token }}
+        persist-credentials: false
+    - name: Run the canonical Ruby SDK checks
+      run: |
+        set -euo pipefail
+        cp Developer-Toolkit/internal/public-repositories/workspace/AGENTS.md AGENTS.md
+        output="$GITHUB_WORKSPACE/.tmp/raims-ruby-sdk/validate-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+        python Developer-Toolkit/scripts/release-preflight/ruby_sdk.py \
+          --source "$GITHUB_WORKSPACE/Raims-Ruby" \
+          --workspace "$GITHUB_WORKSPACE" \
+          --output "$output" \
+          --ruby '3.3=${{ steps.ruby33.outputs.ruby-prefix }}/bin/ruby' \
+          --ruby '4.0=${{ steps.ruby40.outputs.ruby-prefix }}/bin/ruby'
+        python - "$output" <<'PY'
+        import hashlib
+        import json
+        import os
+        from pathlib import Path
+        import subprocess
+        import sys
+        output = Path(sys.argv[1])
+        report = json.loads((output / 'report.json').read_text(encoding='utf-8'))
+        versions = {'3.3':'3.3.13','4.0':'4.0.9'}
+        if (report.get('status') != 'passed' or report.get('sourceUnchanged') is not True
+                or report.get('physicalTestsOnlyInTmp') is not True or report.get('liveApiCalled') is not False
+                or set(report['runtimes']) != set(versions)):
+            raise SystemExit('The canonical Ruby SDK report is invalid.')
+        for series, version in versions.items():
+            runtime = report['runtimes'][series]
+            if not runtime['ruby'].startswith('ruby '+version+' ') or runtime.get('status') != 'passed' or runtime.get('cleanup') is not True:
+                raise SystemExit('The required Ruby runtime did not pass.')
+            installed = runtime.get('installedGem', {})
+            if installed.get('status') != 'passed' or installed.get('assertions') != runtime.get('assertions'):
+                raise SystemExit('The independent installed gem suite did not pass.')
+        package = report['packages']['4.0']
+        metadata = package['metadata']
+        identity = {'name':metadata['name'],'version':metadata['version']}
+        if identity['name'] != 'raims':
+            raise SystemExit('The canonical gem identity differs.')
+        raw = Path(package['path']).read_bytes()
+        if hashlib.sha256(raw).hexdigest() != package['sha256']:
+            raise SystemExit('The approved gem bytes changed.')
+        dist = output / 'dist'
+        dist.mkdir()
+        (dist / 'raims.gem').write_bytes(raw)
+        source = Path(os.environ['GITHUB_WORKSPACE']) / 'Raims-Ruby'
+        head = subprocess.check_output(['git','-C',str(source),'rev-parse','HEAD'],text=True).strip()
+        if head != os.environ['GITHUB_SHA']:
+            raise SystemExit('The canonical Ruby source identity differs.')
+        manifest = {'package':identity,'sourceRevision':head,'toolkitRevision':os.environ['RAIMS_RUBY_TOOLKIT_REF'],
+                    'rubyVersions':versions,'files':{'raims.gem':package['sha256']}}
+        (output / 'release-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8')
+        PY
+    - name: Upload canonical Ruby distribution evidence
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+      with:
+        name: raims-ruby-validation-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          .tmp/raims-ruby-sdk/validate-${{ github.run_id }}-${{ github.run_attempt }}/dist/*
+          .tmp/raims-ruby-sdk/validate-${{ github.run_id }}-${{ github.run_attempt }}/release-manifest.json
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 0
+  securityLinux:
+    name: securityLinux
+    if: github.repository == 'raimshq/raims-ruby'
+    runs-on:
+    - codebuild-raims-github-actions-${{ github.run_id }}-${{ github.run_attempt }}
+    - ruby-sdk-security
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Checkout the candidate commit
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        path: Raims-Ruby
+        persist-credentials: false
+    - name: Setup Python
+      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+      with:
+        python-version: 3.12.14
+    - name: Reject tracked files excluded by repository policy
+      run: |
+        import os
+        from pathlib import Path
+        import subprocess
+        import sys
+        checkout = Path(os.environ['GITHUB_WORKSPACE']) / 'Raims-Ruby'
+        ignored = subprocess.check_output([
+            'git', '-C', str(checkout), 'ls-files', '--cached', '--ignored',
+            '--exclude-from=.gitignore', '-z',
+        ])
+        count = sum(bool(path) for path in ignored.split(b'\0'))
+        if count:
+            print(f'Repository policy rejects {count} tracked ignored file(s).', file=sys.stderr)
+            raise SystemExit(1)
+      shell: python
+    - name: Create a read-only validation source token
+      id: sources
+      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+      with:
+        client-id: ${{ vars.RAIMS_CI_SOURCE_READER_CLIENT_ID }}
+        private-key: ${{ secrets.RAIMS_CI_SOURCE_READER_PRIVATE_KEY }}
+        owner: raimshq
+        repositories: Raims-Developer-Toolkit
+        permission-contents: read
+    - name: Checkout the reviewed validation tooling
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        repository: raimshq/Raims-Developer-Toolkit
+        ref: ${{ env.RAIMS_RUBY_TOOLKIT_REF }}
+        path: Developer-Toolkit
+        token: ${{ steps.sources.outputs.token }}
+        persist-credentials: false
+    - name: Run the canonical SDK security checks
+      run: |
+        set -euo pipefail
+        cp Developer-Toolkit/internal/public-repositories/workspace/AGENTS.md AGENTS.md
+        output="$GITHUB_WORKSPACE/.tmp/raims-ruby-sdk/security-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+        python Developer-Toolkit/scripts/release-preflight/sdk_security.py \
+          --source "$GITHUB_WORKSPACE/Raims-Ruby" \
+          --workspace "$GITHUB_WORKSPACE" \
+          --repository Raims-Ruby \
+          --output "$output" \
+          --prepare-tools
+        python -c 'import json,os,sys; r=json.load(open(sys.argv[1],encoding="utf-8")); sys.exit(0 if r.get("status")=="pass" and r.get("repository")=="Raims-Ruby" and r.get("toolkitRevision")==os.environ["RAIMS_RUBY_TOOLKIT_REF"] else "Canonical SDK security summary is invalid.")' "$output/summary.json"

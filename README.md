@@ -6,26 +6,35 @@ Use resource services, read-only response objects, cursor pagination, structured
 errors, and webhook signature verification in server applications. Requires
 Ruby 3.3 or later.
 
-## Install from GitHub
+## Installation
 
-Source code and the packaged gem are available in the
-[current stable release](https://github.com/raimshq/raims-ruby/releases/latest).
-The SDK is not yet published on RubyGems. Download the gem and its checksums:
+Install the [`raims` gem](https://rubygems.org/gems/raims) from RubyGems:
 
 ```sh
-gh release download --repo raimshq/raims-ruby --pattern raims.gem --pattern SHA256SUMS --dir raims-ruby-release
+gem install raims
 ```
 
-Verify `raims.gem` against `SHA256SUMS`, following the
-[installation guide](docs/installation.md#verify-the-download), then install it:
+For a Bundler application, add the gem to your `Gemfile`:
+
+```ruby
+source 'https://rubygems.org'
+
+gem 'raims'
+```
+
+Then run:
 
 ```sh
-gem install ./raims-ruby-release/raims.gem
+bundle install
 ```
 
-Installation resolves the gem's declared runtime dependencies. Load the SDK
-with `require 'raims'`. See [installation and updates](docs/installation.md)
-for Bundler and updating an existing installation.
+Load the SDK with `require 'raims'`. Keep your application's `Gemfile.lock`
+under version control to retain its resolved dependency versions.
+
+The [GitHub releases](https://github.com/raimshq/raims-ruby/releases/latest)
+also provide `raims.gem` and `SHA256SUMS`. See
+[installation and updates](docs/installation.md) for verified GitHub downloads
+and updating an existing installation.
 
 ## First request
 
