@@ -835,15 +835,15 @@
           "owner": "Raims::RaimsError",
           "parameters": []
         },
+        "api_message": {
+          "owner": "Raims::RaimsError",
+          "parameters": []
+        },
         "code": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
         "details": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "errors": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -856,10 +856,6 @@
           "parameters": []
         },
         "last_response": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "param": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -1191,15 +1187,15 @@
           "owner": "Raims::RaimsError",
           "parameters": []
         },
+        "api_message": {
+          "owner": "Raims::RaimsError",
+          "parameters": []
+        },
         "code": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
         "details": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "errors": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -1212,10 +1208,6 @@
           "parameters": []
         },
         "last_response": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "param": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -3719,15 +3711,15 @@
           "owner": "Raims::RaimsError",
           "parameters": []
         },
+        "api_message": {
+          "owner": "Raims::RaimsError",
+          "parameters": []
+        },
         "code": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
         "details": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "errors": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -3740,10 +3732,6 @@
           "parameters": []
         },
         "last_response": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "param": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -3806,15 +3794,15 @@
           "owner": "Raims::RaimsError",
           "parameters": []
         },
+        "api_message": {
+          "owner": "Raims::RaimsError",
+          "parameters": []
+        },
         "code": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
         "details": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "errors": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -3827,10 +3815,6 @@
           "parameters": []
         },
         "last_response": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "param": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -5739,15 +5723,15 @@
           "owner": "Raims::RaimsError",
           "parameters": []
         },
+        "api_message": {
+          "owner": "Raims::RaimsError",
+          "parameters": []
+        },
         "code": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
         "details": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "errors": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -5760,10 +5744,6 @@
           "parameters": []
         },
         "last_response": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "param": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -5895,15 +5875,15 @@
           "owner": "Raims::RaimsError",
           "parameters": []
         },
+        "api_message": {
+          "owner": "Raims::RaimsError",
+          "parameters": []
+        },
         "code": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
         "details": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "errors": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -5916,10 +5896,6 @@
           "parameters": []
         },
         "last_response": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "param": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -6797,15 +6773,15 @@
           "owner": "Raims::RaimsError",
           "parameters": []
         },
+        "api_message": {
+          "owner": "Raims::RaimsError",
+          "parameters": []
+        },
         "code": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
         "details": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "errors": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -6818,10 +6794,6 @@
           "parameters": []
         },
         "last_response": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "param": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -7064,15 +7036,15 @@
           "owner": "Raims::RaimsError",
           "parameters": []
         },
+        "api_message": {
+          "owner": "Raims::RaimsError",
+          "parameters": []
+        },
         "code": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
         "details": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "errors": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -7085,10 +7057,6 @@
           "parameters": []
         },
         "last_response": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "param": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -7152,15 +7120,15 @@
           "owner": "Raims::RaimsError",
           "parameters": []
         },
+        "api_message": {
+          "owner": "Raims::RaimsError",
+          "parameters": []
+        },
         "code": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
         "details": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "errors": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -7173,10 +7141,6 @@
           "parameters": []
         },
         "last_response": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "param": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -8109,15 +8073,15 @@
           "owner": "Raims::RaimsError",
           "parameters": []
         },
+        "api_message": {
+          "owner": "Raims::RaimsError",
+          "parameters": []
+        },
         "code": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
         "details": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "errors": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -8130,10 +8094,6 @@
           "parameters": []
         },
         "last_response": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "param": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -8800,15 +8760,15 @@
           "owner": "Raims::RaimsError",
           "parameters": []
         },
+        "api_message": {
+          "owner": "Raims::RaimsError",
+          "parameters": []
+        },
         "code": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
         "details": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "errors": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },
@@ -8821,10 +8781,6 @@
           "parameters": []
         },
         "last_response": {
-          "owner": "Raims::RaimsError",
-          "parameters": []
-        },
-        "param": {
           "owner": "Raims::RaimsError",
           "parameters": []
         },

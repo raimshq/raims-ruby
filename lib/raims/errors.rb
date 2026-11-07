@@ -28,12 +28,9 @@ module Raims
       value if value.is_a?(String)
     end
 
-    def param
-      api_error && api_error['param']
-    end
-
-    def errors
-      api_error && api_error['errors']
+    def api_message
+      value = api_error && api_error['message']
+      value if value.is_a?(String)
     end
 
     def details

@@ -11,7 +11,7 @@ module Raims
     end
 
     def request_id
-      headers['request-id'] || headers['x-request-id']
+      headers['request-id']
     end
 
     def retry_after

@@ -17,15 +17,17 @@ arguments raise `ArgumentError` before sending HTTP.
 | `SignatureVerificationError` | Invalid webhook authentication or authenticated JSON |
 
 HTTP errors expose `http_status` (also `status_code`), `request_id`,
-`retry_after`, `code`, `details`, `api_error`, and `last_response` when
-available. `details` contains the field validation failures returned by the
-API, as hashes with `field`, `code`, and `message`. It is `nil` when no field
-details are present. Use codes to decide how your integration handles an error.
-`api_error` preserves the complete structured error. The error's default
-message and representation omit payload data.
+`retry_after`, `code`, `api_message`, `details`, `api_error`, and `last_response`
+when available. `code` identifies the error, and `api_message` exposes the API's
+`message` explicitly. Both return `nil` if the field is absent or is not a string.
+Use codes to decide how your integration handles an error.
 
-The existing `param` and `errors` readers remain available for compatibility;
-the public API uses `details` for field validation failures.
+`details` contains the field validation failures returned by the API, as
+hashes with `field`, `code`, and `message`. It returns `nil` if the field is
+absent or is not an array, and preserves an empty array. `api_error` preserves
+the complete structured error. These values are read-only. The exception's
+default `message`, `to_s`, and `inspect` omit payload data; access `api_message`
+explicitly when you need the API's explanation.
 
 ```ruby
 begin
@@ -39,6 +41,14 @@ end
 
 The example's handlers belong to your application. Avoid logging complete
 error objects, error fields, or HTTP headers when they contain private data.
+
+
+## Migrating error handling from 0.1
+
+Version 0.2 removes the `param` and `errors` readers. Use `code` to choose
+how to handle an API failure, `api_message` for the API message, and
+`details` for field validation errors. The default exception message remains
+generic.
 
 ## Read retries
 
