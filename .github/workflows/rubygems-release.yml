@@ -12,7 +12,7 @@ concurrency:
 env:
   PYTHONDONTWRITEBYTECODE: '1'
   PYTHONOPTIMIZE: '0'
-  RAIMS_RUBY_TOOLKIT_REF: ad7ef9f75e3b21104fd13fa5762501c851dcccd9
+  RAIMS_RUBY_TOOLKIT_REF: 4dc550a0e55c52dd2c8c8f7662289890ae526a8d
 jobs:
   validateRelease:
     permissions:
