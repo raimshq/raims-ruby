@@ -12,7 +12,7 @@ concurrency:
 env:
   PYTHONDONTWRITEBYTECODE: '1'
   PYTHONOPTIMIZE: '0'
-  RAIMS_RUBY_TOOLKIT_REF: ad7ef9f75e3b21104fd13fa5762501c851dcccd9
+  RAIMS_RUBY_TOOLKIT_REF: 4dc550a0e55c52dd2c8c8f7662289890ae526a8d
 jobs:
   validateRuby:
     name: validateRuby
@@ -91,6 +91,7 @@ jobs:
         cp Developer-Toolkit/internal/public-repositories/workspace/AGENTS.md AGENTS.md
         output="$GITHUB_WORKSPACE/.tmp/raims-ruby-sdk/validate-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
         python Developer-Toolkit/scripts/release-preflight/ruby_sdk.py \
+          --prepare-tools \
           --source "$GITHUB_WORKSPACE/Raims-Ruby" \
           --workspace "$GITHUB_WORKSPACE" \
           --output "$output" \
