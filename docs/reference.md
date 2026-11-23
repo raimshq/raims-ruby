@@ -105,9 +105,9 @@ List charges.
 | `before` | `String` | No | Copy page.previous_before from the previous response to move backward. Keep the same filters and sort order; do not send after as well. Leave it empty if you do not want to go backward. |
 | `identifier` | `String` | No | Filter by the complete charge ID. If there is no match, list is empty. |
 | `customer_id` | `String` | No | Filter by the customer's complete public ID returned when creating or retrieving the customer. The relationship remains unchanged if the name or email changes. It can be combined with other filters; keep the same customer_id when changing pages. A valid ID with no charges in the authenticated company and environment returns an empty list. An empty or omitted value does not apply the filter. |
-| `external_reference` | `String` | No | Filter by the charge's current reference in your system, matching the complete value, including case and accents. An empty or omitted value does not apply the filter. It can be combined with other filters; preserve the value when navigating by cursor. After creating or editing a charge, it may take a few seconds for search to reflect the reference. |
+| `external_reference` | `String` | No | Filters by the charge's current reference in your system. It matches the complete value, including letter case and accents. New or updated charges can be temporarily missing from the results. An empty or omitted value skips the filter. Keep the value when navigating by cursor. |
 | `email` | `String` | No | Filter by the complete email address recorded on the charge. Editing the customer record does not change that email address. |
-| `status` | `String` | No | Filter by one or more comma-separated codes, such as 0,1. 0 created, 1 awaiting payment, 2 authorized, 3 processing, 4 paid, 5 partially refunded, 6 refunded, 7 cancelled, 8 expired, 9 failed, 10 chargeback, 11 chargeback under review, 12 chargeback lost, and 13 chargeback won. Changes may take a few seconds to appear. |
+| `status` | `String` | No | Filters by one or more comma-separated codes, such as 0,1. 0 created, 1 awaiting payment, 2 authorized, 3 processing, 4 paid, 5 partially refunded, 6 refunded, 7 canceled, 8 expired, 9 failed, 10 chargeback, 11 chargeback under review, 12 chargeback lost, and 13 chargeback won. Search may take time to reflect the current status. |
 | `payment_method` | `String` | No | Filter by the charge's payment method: 1 for Pix and 2 for boleto. To combine them, send 1,2. A charge with an undefined method may switch to Pix or boleto when the Pix code or boleto is generated in checkout. Selecting a method on the page alone does not change the filter. |
 | `created_gte` | `Integer` | No | Filter charges created at or after this instant, inclusive, in Unix seconds UTC. If created_lte is supplied, this value must be less than or equal to it. |
 | `created_lte` | `Integer` | No | Filter charges created at or before this instant, inclusive, in Unix seconds UTC. |
@@ -124,7 +124,7 @@ Create a new charge.
 
 | Field | Ruby value | Required | Description |
 | --- | --- | --- | --- |
-| `customer_id` | `String` | Yes | ID of a customer in the authenticated company and environment. Copy the id returned when creating or retrieving the customer. Direct Pix requires a valid CPF/CNPJ. Direct boleto requires a name, valid email address, CPF/CNPJ, and address including CEP and street number; complete those fields on the customer record. |
+| `customer_id` | `String` | Yes | ID of a customer in the authenticated company and environment. Use the id from the customer creation response immediately, or look up the customer by ID. Direct Pix issuance requires a valid CPF/CNPJ. Direct boleto issuance requires a name, valid email, CPF/CNPJ, and address including postal code and street number. |
 | `amount_cents` | `Integer` | Yes | Charge amount in Brazilian real cents. For example, 10000 represents BRL 100.00. |
 | `payment_method` | `Integer` | No | Charge payment method. Omit it or send 0 to allow selection in checkout. Without payment_method_types, 1 requests Pix and 2 requests boleto at creation, subject to enabled methods. Boleto uses the customer's address and fills missing fields from the CEP when available. With a custom list, send 0 or omit this field; issuance occurs after the checkout selection. |
 | `due_date` | `Integer` | Yes | Due date in Unix seconds UTC, at least five minutes in the future. The latest date is today plus ten years, using the São Paulo calendar. |
@@ -169,10 +169,10 @@ List customers.
 | `after` | `String` | No | Copy page.next_after from the previous response to move forward. Use the cursor unchanged, keep the same filters, and do not send before as well. |
 | `before` | `String` | No | Copy page.previous_before from the previous response to go back one page. Keep the same filters and do not send after as well. |
 | `identifier` | `String` | No | Customer's public identifier, with the cus_ prefix. |
-| `name` | `String` | No | Search by customer name, with the newest records first. Leave it empty to ignore this filter. |
+| `name` | `String` | No | Searches by customer name, with the newest records first. New or updated customers can be temporarily missing from the results. After a name change, searching for the old name can still return the customer with the new name. Leave empty to ignore this filter. |
 | `email` | `String` | No | Filter by the customer's complete email address. |
 | `document` | `String` | No | Filter by the customer's complete CPF or CNPJ, with or without periods, slash, hyphen, and spaces. |
-| `external_reference` | `String` | No | Filter by the customer's current reference in your system, matching the complete value, including case and accents. It can be combined with other filters. After creating or editing the customer, search may take a few seconds to reflect the reference. Preserve the value when navigating by cursor. |
+| `external_reference` | `String` | No | Filters by the customer's current reference in your system. It matches the complete value, including letter case and accents. New or updated customers can be temporarily missing from the results. Keep the value when navigating by cursor. |
 
 ### DeleteCustomersBatchParams
 
@@ -443,7 +443,7 @@ Rotate the signing secret.
 
 | Field | Ruby value | Required | Description |
 | --- | --- | --- | --- |
-| `grace_period_seconds` | `Integer` | No | Period during which the previous secret can continue signing deliveries. Zero generates a new signature and ends the validity of previous secrets, including during an active transition. Requests already authorized or in progress may arrive with the previous signature. |
+| `grace_period_seconds` | `Integer` | No | Period during which the previous secret may continue signing deliveries. Zero generates a new secret and ends the validity of previous secrets, including during an active transition. Requests already authorized or in progress may arrive with the previous signature. |
 
 ### ListWithdrawalDestinationsParams
 
@@ -553,13 +553,41 @@ Constants in `Raims::EnumValues` come from the public contract's enums. Numeric 
 | `CREATE_CHECKOUT_LOGO_UPLOAD_REQUEST_CONTENT_TYPE_IMAGE_PNG` | `image/png` |
 | `CREATE_PAYMENT_LINK_REQUEST_PAYMENT_METHOD_TYPES_ITEM_BOLETO` | `2` |
 | `CREATE_PAYMENT_LINK_REQUEST_PAYMENT_METHOD_TYPES_ITEM_PIX` | `1` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_ACCOUNT_RESTORED` | `account.restored` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_BALANCE_HOLD_CREATED` | `balance.hold.created` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_BALANCE_HOLD_RELEASED` | `balance.hold.released` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_BOLETO_AVAILABLE` | `boleto.available` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_BOLETO_COMPENSATED` | `boleto.compensated` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_BOLETO_ISSUANCE_FAILED` | `boleto.issuance_failed` |
 | `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_CHARGE_CANCELED` | `charge.canceled` |
 | `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_CHARGE_CREATED` | `charge.created` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_CHARGE_EXPIRED` | `charge.expired` |
 | `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_CHARGE_FAILED` | `charge.failed` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_CHARGE_FULLY_REFUNDED` | `charge.fully_refunded` |
 | `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_CHARGE_PAID` | `charge.paid` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_CHARGE_UPDATED` | `charge.updated` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_CUSTOMER_CREATED` | `customer.created` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_CUSTOMER_DELETED` | `customer.deleted` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_CUSTOMER_UPDATED` | `customer.updated` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_DISPUTE_CLOSED` | `dispute.closed` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_DISPUTE_FUNDS_DEBITED` | `dispute.funds_debited` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_DISPUTE_OPENED` | `dispute.opened` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_DISPUTE_UPDATED` | `dispute.updated` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_PAYMENT_LINK_CREATED` | `payment_link.created` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_PAYMENT_LINK_UPDATED` | `payment_link.updated` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_PIX_AVAILABLE` | `pix.available` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_PIX_ISSUANCE_FAILED` | `pix.issuance_failed` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_PIX_REFUND_RECEIVED` | `pix_refund.received` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_REFUND_ACCEPTED` | `refund.accepted` |
 | `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_REFUND_COMPLETED` | `refund.completed` |
 | `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_REFUND_FAILED` | `refund.failed` |
 | `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_REFUND_REQUESTED` | `refund.requested` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_STATEMENT_CREATED` | `statement.created` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_TED_RECEIVED` | `ted.received` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_WITHDRAWAL_ACCEPTED` | `withdrawal.accepted` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_WITHDRAWAL_COMPLETED` | `withdrawal.completed` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_WITHDRAWAL_FAILED` | `withdrawal.failed` |
+| `CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_WITHDRAWAL_REQUESTED` | `withdrawal.requested` |
 | `CUSTOMER_CREATED_TAX_ID_TYPE_CNPJ` | `cnpj` |
 | `CUSTOMER_CREATED_TAX_ID_TYPE_CPF` | `cpf` |
 | `CUSTOMER_LIST_ITEM_TAX_ID_TYPE_CNPJ` | `cnpj` |
@@ -644,13 +672,41 @@ Constants in `Raims::EnumValues` come from the public contract's enums. Numeric 
 | `WEBHOOK_CREATED_DISABLED_REASON_MANUAL` | `manual` |
 | `WEBHOOK_DISABLED_REASON_CONTINUOUS_FAILURE` | `continuous_failure` |
 | `WEBHOOK_DISABLED_REASON_MANUAL` | `manual` |
+| `WEBHOOK_EVENT_TYPE_CODE_ACCOUNT_RESTORED` | `account.restored` |
+| `WEBHOOK_EVENT_TYPE_CODE_BALANCE_HOLD_CREATED` | `balance.hold.created` |
+| `WEBHOOK_EVENT_TYPE_CODE_BALANCE_HOLD_RELEASED` | `balance.hold.released` |
+| `WEBHOOK_EVENT_TYPE_CODE_BOLETO_AVAILABLE` | `boleto.available` |
+| `WEBHOOK_EVENT_TYPE_CODE_BOLETO_COMPENSATED` | `boleto.compensated` |
+| `WEBHOOK_EVENT_TYPE_CODE_BOLETO_ISSUANCE_FAILED` | `boleto.issuance_failed` |
 | `WEBHOOK_EVENT_TYPE_CODE_CHARGE_CANCELED` | `charge.canceled` |
 | `WEBHOOK_EVENT_TYPE_CODE_CHARGE_CREATED` | `charge.created` |
+| `WEBHOOK_EVENT_TYPE_CODE_CHARGE_EXPIRED` | `charge.expired` |
 | `WEBHOOK_EVENT_TYPE_CODE_CHARGE_FAILED` | `charge.failed` |
+| `WEBHOOK_EVENT_TYPE_CODE_CHARGE_FULLY_REFUNDED` | `charge.fully_refunded` |
 | `WEBHOOK_EVENT_TYPE_CODE_CHARGE_PAID` | `charge.paid` |
+| `WEBHOOK_EVENT_TYPE_CODE_CHARGE_UPDATED` | `charge.updated` |
+| `WEBHOOK_EVENT_TYPE_CODE_CUSTOMER_CREATED` | `customer.created` |
+| `WEBHOOK_EVENT_TYPE_CODE_CUSTOMER_DELETED` | `customer.deleted` |
+| `WEBHOOK_EVENT_TYPE_CODE_CUSTOMER_UPDATED` | `customer.updated` |
+| `WEBHOOK_EVENT_TYPE_CODE_DISPUTE_CLOSED` | `dispute.closed` |
+| `WEBHOOK_EVENT_TYPE_CODE_DISPUTE_FUNDS_DEBITED` | `dispute.funds_debited` |
+| `WEBHOOK_EVENT_TYPE_CODE_DISPUTE_OPENED` | `dispute.opened` |
+| `WEBHOOK_EVENT_TYPE_CODE_DISPUTE_UPDATED` | `dispute.updated` |
+| `WEBHOOK_EVENT_TYPE_CODE_PAYMENT_LINK_CREATED` | `payment_link.created` |
+| `WEBHOOK_EVENT_TYPE_CODE_PAYMENT_LINK_UPDATED` | `payment_link.updated` |
+| `WEBHOOK_EVENT_TYPE_CODE_PIX_AVAILABLE` | `pix.available` |
+| `WEBHOOK_EVENT_TYPE_CODE_PIX_ISSUANCE_FAILED` | `pix.issuance_failed` |
+| `WEBHOOK_EVENT_TYPE_CODE_PIX_REFUND_RECEIVED` | `pix_refund.received` |
+| `WEBHOOK_EVENT_TYPE_CODE_REFUND_ACCEPTED` | `refund.accepted` |
 | `WEBHOOK_EVENT_TYPE_CODE_REFUND_COMPLETED` | `refund.completed` |
 | `WEBHOOK_EVENT_TYPE_CODE_REFUND_FAILED` | `refund.failed` |
 | `WEBHOOK_EVENT_TYPE_CODE_REFUND_REQUESTED` | `refund.requested` |
+| `WEBHOOK_EVENT_TYPE_CODE_STATEMENT_CREATED` | `statement.created` |
+| `WEBHOOK_EVENT_TYPE_CODE_TED_RECEIVED` | `ted.received` |
+| `WEBHOOK_EVENT_TYPE_CODE_WITHDRAWAL_ACCEPTED` | `withdrawal.accepted` |
+| `WEBHOOK_EVENT_TYPE_CODE_WITHDRAWAL_COMPLETED` | `withdrawal.completed` |
+| `WEBHOOK_EVENT_TYPE_CODE_WITHDRAWAL_FAILED` | `withdrawal.failed` |
+| `WEBHOOK_EVENT_TYPE_CODE_WITHDRAWAL_REQUESTED` | `withdrawal.requested` |
 | `WEBHOOK_HEALTH_STATUS_DISABLED` | `disabled` |
 | `WEBHOOK_HEALTH_STATUS_FAILING` | `failing` |
 | `WEBHOOK_HEALTH_STATUS_HEALTHY` | `healthy` |
