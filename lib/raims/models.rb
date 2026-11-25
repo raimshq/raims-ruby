@@ -209,6 +209,10 @@ module Raims
     def metadata
       self['metadata']
     end
+
+    def boleto_settlement
+      self['boleto_settlement']
+    end
   end
 
   class ChargeBoletoCompensation < ApiResource
@@ -240,6 +244,20 @@ module Raims
 
     def due_date
       self['due_date']
+    end
+  end
+
+  class ChargeBoletoSettlement < ApiResource
+    def observed_amount_cents
+      self['observed_amount_cents']
+    end
+
+    def confirmed_total_cents
+      self['confirmed_total_cents']
+    end
+
+    def overpayment_cents
+      self['overpayment_cents']
     end
   end
 
@@ -1439,6 +1457,154 @@ module Raims
     end
   end
 
+  class WebhookAdvanceAccepted < ApiResource
+    def delivery_id
+      self['delivery_id']
+    end
+  end
+
+  class WebhookAttempt < ApiResource
+    def id
+      self['id']
+    end
+
+    def delivery_id
+      self['delivery_id']
+    end
+
+    def attempt_number
+      self['attempt_number']
+    end
+
+    def created_at
+      self['created_at']
+    end
+
+    def status_code
+      self['status_code']
+    end
+
+    def duration_ms
+      self['duration_ms']
+    end
+
+    def destination_ip
+      self['destination_ip']
+    end
+
+    def error_code
+      self['error_code']
+    end
+
+    def endpoint_url
+      self['endpoint_url']
+    end
+
+    def request_available
+      self['request_available']
+    end
+
+    def response_body_available
+      self['response_body_available']
+    end
+
+    def response_body_truncated
+      self['response_body_truncated']
+    end
+  end
+
+  class WebhookAttemptDetail < ApiResource
+    def request_body
+      self['request_body']
+    end
+
+    def response_body
+      self['response_body']
+    end
+
+    def id
+      self['id']
+    end
+
+    def delivery_id
+      self['delivery_id']
+    end
+
+    def attempt_number
+      self['attempt_number']
+    end
+
+    def created_at
+      self['created_at']
+    end
+
+    def status_code
+      self['status_code']
+    end
+
+    def duration_ms
+      self['duration_ms']
+    end
+
+    def destination_ip
+      self['destination_ip']
+    end
+
+    def error_code
+      self['error_code']
+    end
+
+    def endpoint_url
+      self['endpoint_url']
+    end
+
+    def request_available
+      self['request_available']
+    end
+
+    def response_body_available
+      self['response_body_available']
+    end
+
+    def response_body_truncated
+      self['response_body_truncated']
+    end
+  end
+
+  class WebhookAttemptListResponse < ApiResource
+    def list
+      self['list']
+    end
+
+    def page
+      self['page']
+    end
+  end
+
+  class WebhookBulkResendAccepted < ApiResource
+    def results
+      self['results']
+    end
+  end
+
+  class WebhookBulkResendItem < ApiResource
+    def source_delivery_id
+      self['source_delivery_id']
+    end
+
+    def delivery_id
+      self['delivery_id']
+    end
+
+    def event_id
+      self['event_id']
+    end
+
+    def error
+      self['error']
+    end
+  end
+
   class WebhookCreated < ApiResource
     def id
       self['id']
@@ -1490,6 +1656,148 @@ module Raims
 
     def paused_at
       self['paused_at']
+    end
+  end
+
+  class WebhookDelivery < ApiResource
+    def id
+      self['id']
+    end
+
+    def webhook_id
+      self['webhook_id']
+    end
+
+    def event_id
+      self['event_id']
+    end
+
+    def event_type
+      self['event_type']
+    end
+
+    def status
+      self['status']
+    end
+
+    def created_at
+      self['created_at']
+    end
+
+    def event_created_at
+      self['event_created_at']
+    end
+
+    def deadline_at
+      self['deadline_at']
+    end
+
+    def next_attempt_at
+      self['next_attempt_at']
+    end
+
+    def updated_at
+      self['updated_at']
+    end
+  end
+
+  class WebhookDeliveryListResponse < ApiResource
+    def list
+      self['list']
+    end
+
+    def page
+      self['page']
+    end
+  end
+
+  class WebhookDeliveryPage < ApiResource
+    def page_size
+      self['page_size']
+    end
+
+    def has_next
+      self['has_next']
+    end
+
+    def has_previous
+      self['has_previous']
+    end
+
+    def next_after
+      self['next_after']
+    end
+
+    def previous_before
+      self['previous_before']
+    end
+  end
+
+  class WebhookDeliveryResendAccepted < ApiResource
+    def delivery_id
+      self['delivery_id']
+    end
+
+    def event_id
+      self['event_id']
+    end
+  end
+
+  class WebhookEvent < ApiResource
+    def id
+      self['id']
+    end
+
+    def event_type
+      self['event_type']
+    end
+
+    def created_at
+      self['created_at']
+    end
+
+    def resource_type
+      self['resource_type']
+    end
+
+    def resource_id
+      self['resource_id']
+    end
+  end
+
+  class WebhookEventDetail < ApiResource
+    def payload
+      self['payload']
+    end
+
+    def id
+      self['id']
+    end
+
+    def event_type
+      self['event_type']
+    end
+
+    def created_at
+      self['created_at']
+    end
+
+    def resource_type
+      self['resource_type']
+    end
+
+    def resource_id
+      self['resource_id']
+    end
+  end
+
+  class WebhookEventListResponse < ApiResource
+    def list
+      self['list']
+    end
+
+    def page
+      self['page']
     end
   end
 

@@ -1,13 +1,13 @@
 {
   "source": {
     "repository": "https://github.com/raimshq/openapi",
-    "revision": "47aed0fee0f57350660595ccad636c4a6464223f",
-    "url": "https://raw.githubusercontent.com/raimshq/openapi/47aed0fee0f57350660595ccad636c4a6464223f/latest/openapi.spec3.json",
-    "sha256": "df7f6bd91a7a70ca20a5a6af84eee7f3a246250b14238e9c8349d6aa5aa670b9",
+    "revision": "355167fd10db87fb00dc18384b5cccb852326f4c",
+    "url": "https://raw.githubusercontent.com/raimshq/openapi/355167fd10db87fb00dc18384b5cccb852326f4c/latest/openapi.spec3.json",
+    "sha256": "907609f20b18d9b08d6c748901fb6488b7a386417261e8fef5e99348834fb7f7",
     "api_version": "1.0.0",
-    "operations": 68,
-    "api_revision": "7973f34e56d10a495e708c6b1a28ea4b9af4c54d",
-    "api_deployment": "44994719153/1"
+    "operations": 78,
+    "api_revision": "3abc05ce76081586546d30c6349366f698d20468",
+    "api_deployment": "45549739992/1"
   },
   "services": {
     "accounts": {
@@ -65,6 +65,20 @@
     "statements": {
       "list": "ListStatements",
       "retrieve": "GetStatement"
+    },
+    "webhook_deliveries": {
+      "list": "ListWebhookDeliveries",
+      "retrieve": "GetWebhookDelivery",
+      "list_attempts": "ListWebhookDeliveryAttempts",
+      "retrieve_attempt": "GetWebhookDeliveryAttempt",
+      "resend": "ResendWebhookDelivery",
+      "resend_many": "ResendWebhookDeliveries",
+      "advance": "AdvanceWebhookDelivery"
+    },
+    "webhook_events": {
+      "list": "ListWebhookEvents",
+      "retrieve": "GetWebhookEvent",
+      "deliver": "DeliverWebhookEvent"
     },
     "webhook_event_types": {
       "list": "ListWebhookEventTypes"
@@ -1955,6 +1969,420 @@
       "paginated": true,
       "summary": "Recuperar extrato"
     },
+    "ResendWebhookDeliveries": {
+      "id": "ResendWebhookDeliveries",
+      "method": "POST",
+      "path": "/v1/webhook_deliveries/resend",
+      "pathParams": [],
+      "query": {},
+      "body": true,
+      "body_required": true,
+      "params_schema": {
+        "$ref": "#/components/schemas/ResendWebhookDeliveriesRequest"
+      },
+      "idempotency": true,
+      "maxBodyBytes": 65536,
+      "responses": {
+        "202": {
+          "$ref": "#/components/schemas/WebhookBulkResendAccepted"
+        }
+      },
+      "paginated": false,
+      "summary": "Reenviar várias entregas"
+    },
+    "ListWebhookDeliveries": {
+      "id": "ListWebhookDeliveries",
+      "method": "GET",
+      "path": "/v1/webhook_deliveries",
+      "pathParams": [],
+      "query": {
+        "page_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "after": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "before": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "webhook_id": {
+          "type": "string",
+          "pattern": "^whk_[A-Za-z0-9]+$",
+          "maxLength": 26
+        },
+        "event_type": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "event_id": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^(?!00000000-0000-0000-0000-000000000000$)[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "status": {
+          "type": "string",
+          "maxLength": 32,
+          "enum": [
+            "pending",
+            "processing",
+            "delivered",
+            "failed",
+            "canceled"
+          ]
+        },
+        "created_gte": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        },
+        "created_lte": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        }
+      },
+      "body": false,
+      "body_required": false,
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "after": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "before": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "webhook_id": {
+            "type": "string",
+            "pattern": "^whk_[A-Za-z0-9]+$",
+            "maxLength": 26
+          },
+          "event_type": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "event_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^(?!00000000-0000-0000-0000-000000000000$)[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+          },
+          "status": {
+            "type": "string",
+            "maxLength": 32,
+            "enum": [
+              "pending",
+              "processing",
+              "delivered",
+              "failed",
+              "canceled"
+            ]
+          },
+          "created_gte": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 253402300799
+          },
+          "created_lte": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 253402300799
+          }
+        },
+        "required": []
+      },
+      "idempotency": false,
+      "maxBodyBytes": null,
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/WebhookDeliveryListResponse"
+        }
+      },
+      "paginated": true,
+      "summary": "Listar entregas de webhooks"
+    },
+    "GetWebhookDelivery": {
+      "id": "GetWebhookDelivery",
+      "method": "GET",
+      "path": "/v1/webhook_deliveries/{delivery_id}",
+      "pathParams": [
+        "delivery_id"
+      ],
+      "query": {},
+      "body": false,
+      "body_required": false,
+      "params_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "idempotency": false,
+      "maxBodyBytes": null,
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/WebhookDelivery"
+        }
+      },
+      "paginated": false,
+      "summary": "Recuperar uma entrega"
+    },
+    "ListWebhookDeliveryAttempts": {
+      "id": "ListWebhookDeliveryAttempts",
+      "method": "GET",
+      "path": "/v1/webhook_deliveries/{delivery_id}/attempts",
+      "pathParams": [
+        "delivery_id"
+      ],
+      "query": {
+        "page_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "after": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "before": {
+          "type": "string",
+          "maxLength": 128
+        }
+      },
+      "body": false,
+      "body_required": false,
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "after": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "before": {
+            "type": "string",
+            "maxLength": 128
+          }
+        },
+        "required": []
+      },
+      "idempotency": false,
+      "maxBodyBytes": null,
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/WebhookAttemptListResponse"
+        }
+      },
+      "paginated": true,
+      "summary": "Listar as tentativas de uma entrega"
+    },
+    "GetWebhookDeliveryAttempt": {
+      "id": "GetWebhookDeliveryAttempt",
+      "method": "GET",
+      "path": "/v1/webhook_deliveries/{delivery_id}/attempts/{attempt_id}",
+      "pathParams": [
+        "delivery_id",
+        "attempt_id"
+      ],
+      "query": {},
+      "body": false,
+      "body_required": false,
+      "params_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "idempotency": false,
+      "maxBodyBytes": null,
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/WebhookAttemptDetail"
+        }
+      },
+      "paginated": false,
+      "summary": "Recuperar uma tentativa"
+    },
+    "ResendWebhookDelivery": {
+      "id": "ResendWebhookDelivery",
+      "method": "POST",
+      "path": "/v1/webhook_deliveries/{delivery_id}/resend",
+      "pathParams": [
+        "delivery_id"
+      ],
+      "query": {},
+      "body": false,
+      "body_required": false,
+      "params_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "idempotency": true,
+      "maxBodyBytes": null,
+      "responses": {
+        "202": {
+          "$ref": "#/components/schemas/WebhookDeliveryResendAccepted"
+        }
+      },
+      "paginated": false,
+      "summary": "Reenviar um evento"
+    },
+    "DeliverWebhookEvent": {
+      "id": "DeliverWebhookEvent",
+      "method": "POST",
+      "path": "/v1/webhook_events/{event_id}/deliveries",
+      "pathParams": [
+        "event_id"
+      ],
+      "query": {},
+      "body": true,
+      "body_required": true,
+      "params_schema": {
+        "$ref": "#/components/schemas/DeliverWebhookEventRequest"
+      },
+      "idempotency": true,
+      "maxBodyBytes": 16384,
+      "responses": {
+        "202": {
+          "$ref": "#/components/schemas/WebhookDeliveryResendAccepted"
+        }
+      },
+      "paginated": false,
+      "summary": "Enviar um evento para um webhook"
+    },
+    "ListWebhookEvents": {
+      "id": "ListWebhookEvents",
+      "method": "GET",
+      "path": "/v1/webhook_events",
+      "pathParams": [],
+      "query": {
+        "page_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "after": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "before": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "event_type": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "resource_id": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "created_gte": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        },
+        "created_lte": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        }
+      },
+      "body": false,
+      "body_required": false,
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "after": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "before": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "event_type": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "resource_id": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "created_gte": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 253402300799
+          },
+          "created_lte": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 253402300799
+          }
+        },
+        "required": []
+      },
+      "idempotency": false,
+      "maxBodyBytes": null,
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/WebhookEventListResponse"
+        }
+      },
+      "paginated": true,
+      "summary": "Listar eventos de webhook"
+    },
+    "GetWebhookEvent": {
+      "id": "GetWebhookEvent",
+      "method": "GET",
+      "path": "/v1/webhook_events/{event_id}",
+      "pathParams": [
+        "event_id"
+      ],
+      "query": {},
+      "body": false,
+      "body_required": false,
+      "params_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "idempotency": false,
+      "maxBodyBytes": null,
+      "responses": {
+        "200": {
+          "$ref": "#/components/schemas/WebhookEventDetail"
+        }
+      },
+      "paginated": false,
+      "summary": "Recuperar um evento de webhook"
+    },
     "ListWebhookEventTypes": {
       "id": "ListWebhookEventTypes",
       "method": "GET",
@@ -2025,6 +2453,31 @@
       },
       "paginated": false,
       "summary": "Pausar ou retomar envios"
+    },
+    "AdvanceWebhookDelivery": {
+      "id": "AdvanceWebhookDelivery",
+      "method": "POST",
+      "path": "/v1/webhook_deliveries/{delivery_id}/advance",
+      "pathParams": [
+        "delivery_id"
+      ],
+      "query": {},
+      "body": false,
+      "body_required": false,
+      "params_schema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "idempotency": true,
+      "maxBodyBytes": null,
+      "responses": {
+        "202": {
+          "$ref": "#/components/schemas/WebhookAdvanceAccepted"
+        }
+      },
+      "paginated": false,
+      "summary": "Antecipar próxima tentativa"
     },
     "ListWebhooks": {
       "id": "ListWebhooks",
@@ -2489,6 +2942,1445 @@
     }
   },
   "schemas": {
+    "ChargeCreatedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "charge.created"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/ChargeCreatedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "ChargeUpdatedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "charge.updated"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/ChargeUpdatedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "ChargePaidWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "charge.paid"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/ChargePaidWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "ChargeExpiredWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "charge.expired"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/ChargeExpiredWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "ChargeCanceledWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "charge.canceled"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/ChargeCanceledWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "ChargeFailedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "charge.failed"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/ChargeFailedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "RefundRequestedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "refund.requested"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/RefundRequestedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "RefundCompletedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "refund.completed"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/RefundCompletedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "RefundFailedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "refund.failed"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/RefundFailedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "WebhookTestWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "webhook.test"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/WebhookTestWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "WithdrawalRequestedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "withdrawal.requested"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/WithdrawalRequestedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "WithdrawalCompletedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "withdrawal.completed"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/WithdrawalCompletedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "WithdrawalFailedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "withdrawal.failed"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/WithdrawalFailedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "DisputeOpenedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "dispute.opened"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/DisputeOpenedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "DisputeUpdatedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "dispute.updated"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/DisputeUpdatedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "DisputeClosedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "dispute.closed"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/DisputeClosedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "DisputeFundsDebitedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "dispute.funds_debited"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/DisputeFundsDebitedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "BalanceHoldCreatedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "balance.hold.created"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/BalanceHoldCreatedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "BalanceHoldReleasedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "balance.hold.released"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/BalanceHoldReleasedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "StatementCreatedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "statement.created"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/StatementCreatedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "TedReceivedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "ted.received"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/TedReceivedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "PixRefundReceivedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "pix_refund.received"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/PixRefundReceivedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "PixAvailableWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "pix.available"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/PixAvailableWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "PixIssuanceFailedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "pix.issuance_failed"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/PixIssuanceFailedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "BoletoAvailableWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "boleto.available"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/BoletoAvailableWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "BoletoIssuanceFailedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "boleto.issuance_failed"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/BoletoIssuanceFailedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "BoletoCompensatedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "boleto.compensated"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/BoletoCompensatedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "PaymentLinkCreatedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "payment_link.created"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/PaymentLinkCreatedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "PaymentLinkUpdatedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "payment_link.updated"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/PaymentLinkUpdatedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "RefundAcceptedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "refund.accepted"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/RefundAcceptedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "AccountRestoredWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "account.restored"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/AccountRestoredWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "CustomerCreatedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "customer.created"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/CustomerCreatedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "CustomerUpdatedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "customer.updated"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/CustomerUpdatedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "CustomerDeletedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "customer.deleted"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/CustomerDeletedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "WithdrawalAcceptedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "withdrawal.accepted"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/WithdrawalAcceptedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "ChargeFullyRefundedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "charge.fully_refunded"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/ChargeFullyRefundedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "ChargePartiallyRefundedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "charge.partially_refunded"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/ChargePartiallyRefundedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "WithdrawalDestinationChangedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "withdrawal.destination_changed"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/WithdrawalDestinationChangedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "BoletoOverpaymentReceivedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "boleto.overpayment_received"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/BoletoOverpaymentReceivedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "RefundReconciliationRequiredWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "refund.reconciliation_required"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/RefundReconciliationRequiredWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "BoletoPartialSettlementDetectedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "boleto.partial_settlement_detected"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/BoletoPartialSettlementDetectedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "WithdrawalAutomaticSettingsChangedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "withdrawal.automatic_settings_changed"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "const": "production"
+        },
+        "data": {
+          "$ref": "#/components/schemas/WithdrawalAutomaticSettingsChangedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "ChargePaymentInstructionsAvailableWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "charge.payment_instructions_available"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/ChargePaymentInstructionsAvailableWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
+    "ChargePaymentInstructionsFailedWebhookEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "const": "charge.payment_instructions_failed"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "sandbox",
+            "production"
+          ]
+        },
+        "data": {
+          "$ref": "#/components/schemas/ChargePaymentInstructionsFailedWebhookEventData"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "created_at",
+        "environment",
+        "data"
+      ]
+    },
     "Charge": {
       "type": "object",
       "required": [
@@ -2628,6 +4520,9 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "boleto_settlement": {
+          "$ref": "#/components/schemas/ChargeBoletoSettlement"
         }
       },
       "additionalProperties": false
@@ -5171,6 +7066,341 @@
         }
       }
     },
+    "ResendWebhookDeliveriesRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "delivery_ids"
+      ],
+      "properties": {
+        "delivery_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^(?!00000000-0000-0000-0000-000000000000$)[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+          },
+          "minItems": 1,
+          "maxItems": 500
+        }
+      }
+    },
+    "WebhookBulkResendAccepted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "results"
+      ],
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/WebhookBulkResendItem"
+          }
+        }
+      }
+    },
+    "WebhookDeliveryListResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "list",
+        "page"
+      ],
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/WebhookDelivery"
+          }
+        },
+        "page": {
+          "$ref": "#/components/schemas/WebhookDeliveryPage"
+        }
+      }
+    },
+    "WebhookDelivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "webhook_id",
+        "event_id",
+        "event_type",
+        "status",
+        "created_at",
+        "event_created_at",
+        "deadline_at",
+        "next_attempt_at",
+        "updated_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "webhook_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^whk_[A-Za-z0-9]+$"
+        },
+        "event_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "event_type": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "processing",
+            "delivered",
+            "failed",
+            "canceled"
+          ]
+        },
+        "created_at": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        },
+        "event_created_at": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        },
+        "deadline_at": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        },
+        "next_attempt_at": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        },
+        "updated_at": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        }
+      }
+    },
+    "WebhookAttemptListResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "list",
+        "page"
+      ],
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/WebhookAttempt"
+          }
+        },
+        "page": {
+          "$ref": "#/components/schemas/WebhookDeliveryPage"
+        }
+      }
+    },
+    "WebhookAttemptDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_body",
+        "response_body",
+        "id",
+        "delivery_id",
+        "attempt_number",
+        "created_at",
+        "status_code",
+        "duration_ms",
+        "destination_ip",
+        "error_code",
+        "endpoint_url",
+        "request_available",
+        "response_body_available",
+        "response_body_truncated"
+      ],
+      "properties": {
+        "request_body": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "response_body": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 8192
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "delivery_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "attempt_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "created_at": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        },
+        "status_code": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 100,
+          "maximum": 599
+        },
+        "duration_ms": {
+          "type": "number",
+          "format": "double",
+          "minimum": 0
+        },
+        "destination_ip": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 45
+        },
+        "error_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "endpoint_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "request_available": {
+          "type": "boolean"
+        },
+        "response_body_available": {
+          "type": "boolean"
+        },
+        "response_body_truncated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "WebhookDeliveryResendAccepted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "delivery_id",
+        "event_id"
+      ],
+      "properties": {
+        "delivery_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "event_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "DeliverWebhookEventRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "webhook_id"
+      ],
+      "properties": {
+        "webhook_id": {
+          "type": "string",
+          "pattern": "^whk_[A-Za-z0-9]+$",
+          "maxLength": 26
+        }
+      }
+    },
+    "WebhookEventListResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "list",
+        "page"
+      ],
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/WebhookEvent"
+          }
+        },
+        "page": {
+          "$ref": "#/components/schemas/WebhookDeliveryPage"
+        }
+      }
+    },
+    "WebhookEventDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "payload",
+        "id",
+        "event_type",
+        "created_at",
+        "resource_type",
+        "resource_id"
+      ],
+      "properties": {
+        "payload": {
+          "type": "string",
+          "contentMediaType": "application/json"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^(?!00000000-0000-0000-0000-000000000000$)[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "event_type": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        },
+        "resource_type": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        }
+      }
+    },
     "WebhookEventTypeListResponse": {
       "type": "object",
       "additionalProperties": false,
@@ -5297,6 +7527,19 @@
         }
       }
     },
+    "WebhookAdvanceAccepted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "delivery_id"
+      ],
+      "properties": {
+        "delivery_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
     "WebhookListResponse": {
       "type": "object",
       "additionalProperties": false,
@@ -5362,10 +7605,8 @@
               "statement.created",
               "ted.received",
               "pix_refund.received",
-              "pix.available",
-              "pix.issuance_failed",
-              "boleto.available",
-              "boleto.issuance_failed",
+              "charge.payment_instructions_available",
+              "charge.payment_instructions_failed",
               "boleto.compensated",
               "payment_link.created",
               "payment_link.updated",
@@ -5375,10 +7616,155 @@
               "customer.updated",
               "customer.deleted",
               "withdrawal.accepted",
-              "charge.fully_refunded"
+              "charge.fully_refunded",
+              "charge.partially_refunded",
+              "withdrawal.destination_changed",
+              "boleto.overpayment_received",
+              "refund.reconciliation_required",
+              "boleto.partial_settlement_detected",
+              "withdrawal.automatic_settings_changed"
             ]
           },
-          "minItems": 1
+          "minItems": 1,
+          "x-raims-webhook-event-environments": {
+            "charge.created": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.paid": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.canceled": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.failed": [
+              "Sandbox",
+              "Production"
+            ],
+            "refund.requested": [
+              "Sandbox",
+              "Production"
+            ],
+            "refund.completed": [
+              "Sandbox",
+              "Production"
+            ],
+            "refund.failed": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.updated": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.expired": [
+              "Sandbox",
+              "Production"
+            ],
+            "withdrawal.requested": [
+              "Production"
+            ],
+            "withdrawal.completed": [
+              "Production"
+            ],
+            "withdrawal.failed": [
+              "Production"
+            ],
+            "dispute.opened": [
+              "Production"
+            ],
+            "dispute.updated": [
+              "Production"
+            ],
+            "dispute.closed": [
+              "Production"
+            ],
+            "dispute.funds_debited": [
+              "Production"
+            ],
+            "balance.hold.created": [
+              "Production"
+            ],
+            "balance.hold.released": [
+              "Production"
+            ],
+            "statement.created": [
+              "Sandbox",
+              "Production"
+            ],
+            "ted.received": [
+              "Production"
+            ],
+            "pix_refund.received": [
+              "Production"
+            ],
+            "charge.payment_instructions_available": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.payment_instructions_failed": [
+              "Sandbox",
+              "Production"
+            ],
+            "boleto.compensated": [
+              "Sandbox",
+              "Production"
+            ],
+            "payment_link.created": [
+              "Sandbox",
+              "Production"
+            ],
+            "payment_link.updated": [
+              "Sandbox",
+              "Production"
+            ],
+            "refund.accepted": [
+              "Production"
+            ],
+            "account.restored": [
+              "Production"
+            ],
+            "customer.created": [
+              "Sandbox",
+              "Production"
+            ],
+            "customer.updated": [
+              "Sandbox",
+              "Production"
+            ],
+            "customer.deleted": [
+              "Sandbox",
+              "Production"
+            ],
+            "withdrawal.accepted": [
+              "Production"
+            ],
+            "charge.fully_refunded": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.partially_refunded": [
+              "Sandbox",
+              "Production"
+            ],
+            "withdrawal.destination_changed": [
+              "Production"
+            ],
+            "boleto.overpayment_received": [
+              "Production"
+            ],
+            "refund.reconciliation_required": [
+              "Production"
+            ],
+            "boleto.partial_settlement_detected": [
+              "Production"
+            ],
+            "withdrawal.automatic_settings_changed": [
+              "Production"
+            ]
+          }
         },
         "is_active": {
           "type": "boolean"
@@ -5595,7 +7981,146 @@
           "items": {
             "type": "string"
           },
-          "minItems": 1
+          "minItems": 1,
+          "x-raims-webhook-event-environments": {
+            "charge.created": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.paid": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.canceled": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.failed": [
+              "Sandbox",
+              "Production"
+            ],
+            "refund.requested": [
+              "Sandbox",
+              "Production"
+            ],
+            "refund.completed": [
+              "Sandbox",
+              "Production"
+            ],
+            "refund.failed": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.updated": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.expired": [
+              "Sandbox",
+              "Production"
+            ],
+            "withdrawal.requested": [
+              "Production"
+            ],
+            "withdrawal.completed": [
+              "Production"
+            ],
+            "withdrawal.failed": [
+              "Production"
+            ],
+            "dispute.opened": [
+              "Production"
+            ],
+            "dispute.updated": [
+              "Production"
+            ],
+            "dispute.closed": [
+              "Production"
+            ],
+            "dispute.funds_debited": [
+              "Production"
+            ],
+            "balance.hold.created": [
+              "Production"
+            ],
+            "balance.hold.released": [
+              "Production"
+            ],
+            "statement.created": [
+              "Sandbox",
+              "Production"
+            ],
+            "ted.received": [
+              "Production"
+            ],
+            "pix_refund.received": [
+              "Production"
+            ],
+            "charge.payment_instructions_available": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.payment_instructions_failed": [
+              "Sandbox",
+              "Production"
+            ],
+            "boleto.compensated": [
+              "Sandbox",
+              "Production"
+            ],
+            "payment_link.created": [
+              "Sandbox",
+              "Production"
+            ],
+            "payment_link.updated": [
+              "Sandbox",
+              "Production"
+            ],
+            "refund.accepted": [
+              "Production"
+            ],
+            "account.restored": [
+              "Production"
+            ],
+            "customer.created": [
+              "Sandbox",
+              "Production"
+            ],
+            "customer.updated": [
+              "Sandbox",
+              "Production"
+            ],
+            "customer.deleted": [
+              "Sandbox",
+              "Production"
+            ],
+            "withdrawal.accepted": [
+              "Production"
+            ],
+            "charge.fully_refunded": [
+              "Sandbox",
+              "Production"
+            ],
+            "charge.partially_refunded": [
+              "Sandbox",
+              "Production"
+            ],
+            "withdrawal.destination_changed": [
+              "Production"
+            ],
+            "boleto.overpayment_received": [
+              "Production"
+            ],
+            "refund.reconciliation_required": [
+              "Production"
+            ],
+            "boleto.partial_settlement_detected": [
+              "Production"
+            ],
+            "withdrawal.automatic_settings_changed": [
+              "Production"
+            ]
+          }
         },
         "is_active": {
           "type": "boolean"
@@ -6027,9 +8552,45 @@
           "enum": [
             "awaiting_payment",
             "compensated",
+            "partially_settled",
             "settled",
             null
           ]
+        }
+      }
+    },
+    "ChargeBoletoSettlement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observed_amount_cents",
+        "confirmed_total_cents",
+        "overpayment_cents"
+      ],
+      "properties": {
+        "observed_amount_cents": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "minimum": 1
+        },
+        "confirmed_total_cents": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "minimum": 1
+        },
+        "overpayment_cents": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "minimum": 0
         }
       }
     },
@@ -6684,6 +9245,195 @@
         }
       }
     },
+    "WebhookBulkResendItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_delivery_id",
+        "delivery_id",
+        "event_id",
+        "error"
+      ],
+      "properties": {
+        "source_delivery_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "delivery_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "event_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Error"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "WebhookDeliveryPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "page_size",
+        "has_next",
+        "has_previous",
+        "next_after",
+        "previous_before"
+      ],
+      "properties": {
+        "page_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "has_next": {
+          "type": "boolean"
+        },
+        "has_previous": {
+          "type": "boolean"
+        },
+        "next_after": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "previous_before": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "WebhookAttempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "delivery_id",
+        "attempt_number",
+        "created_at",
+        "status_code",
+        "duration_ms",
+        "destination_ip",
+        "error_code",
+        "endpoint_url",
+        "request_available",
+        "response_body_available",
+        "response_body_truncated"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "delivery_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "attempt_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "created_at": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        },
+        "status_code": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 100,
+          "maximum": 599
+        },
+        "duration_ms": {
+          "type": "number",
+          "format": "double",
+          "minimum": 0
+        },
+        "destination_ip": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 45
+        },
+        "error_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "endpoint_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "request_available": {
+          "type": "boolean"
+        },
+        "response_body_available": {
+          "type": "boolean"
+        },
+        "response_body_truncated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "WebhookEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "event_type",
+        "created_at",
+        "resource_type",
+        "resource_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^(?!00000000-0000-0000-0000-000000000000$)[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "event_type": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 253402300799
+        },
+        "resource_type": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        }
+      }
+    },
     "WebhookEventType": {
       "type": "object",
       "additionalProperties": false,
@@ -6715,10 +9465,8 @@
             "statement.created",
             "ted.received",
             "pix_refund.received",
-            "pix.available",
-            "pix.issuance_failed",
-            "boleto.available",
-            "boleto.issuance_failed",
+            "charge.payment_instructions_available",
+            "charge.payment_instructions_failed",
             "boleto.compensated",
             "payment_link.created",
             "payment_link.updated",
@@ -6728,7 +9476,13 @@
             "customer.updated",
             "customer.deleted",
             "withdrawal.accepted",
-            "charge.fully_refunded"
+            "charge.fully_refunded",
+            "charge.partially_refunded",
+            "withdrawal.destination_changed",
+            "boleto.overpayment_received",
+            "refund.reconciliation_required",
+            "boleto.partial_settlement_detected",
+            "withdrawal.automatic_settings_changed"
           ]
         }
       }
@@ -7033,6 +9787,1393 @@
           "format": "int64"
         }
       }
+    },
+    "ChargeCreatedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "ChargeUpdatedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "ChargePaidWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        },
+        "statement_id": {
+          "type": "string",
+          "pattern": "^st_[A-Za-z0-9]+$"
+        },
+        "paid_amount_cents": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1
+        },
+        "currency": {
+          "type": "string",
+          "const": "BRL"
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ],
+      "dependentRequired": {
+        "paid_amount_cents": [
+          "currency"
+        ],
+        "currency": [
+          "paid_amount_cents"
+        ]
+      }
+    },
+    "ChargeExpiredWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "ChargeCanceledWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "ChargeFailedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "RefundRequestedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "refund"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^rf_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        },
+        "charge_id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "amount_cents": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1
+        },
+        "currency": {
+          "type": "string",
+          "const": "BRL"
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ],
+      "dependentRequired": {
+        "amount_cents": [
+          "currency"
+        ],
+        "currency": [
+          "amount_cents"
+        ]
+      }
+    },
+    "RefundCompletedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "refund"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^rf_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        },
+        "charge_id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "statement_id": {
+          "type": "string",
+          "pattern": "^st_[A-Za-z0-9]+$"
+        },
+        "amount_cents": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1
+        },
+        "currency": {
+          "type": "string",
+          "const": "BRL"
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ],
+      "dependentRequired": {
+        "amount_cents": [
+          "currency"
+        ],
+        "currency": [
+          "amount_cents"
+        ]
+      }
+    },
+    "RefundFailedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "refund"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^rf_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        },
+        "charge_id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "amount_cents": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1
+        },
+        "currency": {
+          "type": "string",
+          "const": "BRL"
+        },
+        "failure_reason_code": {
+          "type": "string",
+          "enum": [
+            "REFUND_NOT_SUBMITTED",
+            "REFUND_REJECTED",
+            "REFUND_PROCESSING_UNAVAILABLE",
+            "REFUND_PROCESSING_FAILED",
+            "REFUND_FAILURE_REASON_UNAVAILABLE"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ],
+      "dependentRequired": {
+        "amount_cents": [
+          "currency"
+        ],
+        "currency": [
+          "amount_cents"
+        ]
+      }
+    },
+    "WebhookTestWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "webhook"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^whk_[A-Za-z0-9]+$"
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "WithdrawalRequestedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "withdrawal"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^wd_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "WithdrawalCompletedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "withdrawal"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^wd_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "WithdrawalFailedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "withdrawal"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^wd_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "DisputeOpenedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "dispute"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^(?:dp_[A-Za-z0-9]+|med_[1-9][0-9]*)$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        },
+        "charge_id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "DisputeUpdatedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "dispute"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^(?:dp_[A-Za-z0-9]+|med_[1-9][0-9]*)$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        },
+        "charge_id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "DisputeClosedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "dispute"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^(?:dp_[A-Za-z0-9]+|med_[1-9][0-9]*)$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        },
+        "charge_id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "DisputeFundsDebitedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "dispute"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^(?:dp_[A-Za-z0-9]+|med_[1-9][0-9]*)$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        },
+        "charge_id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "statement_id": {
+          "type": "string",
+          "pattern": "^st_[A-Za-z0-9]+$"
+        },
+        "debited_amount_cents": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1
+        },
+        "currency": {
+          "type": "string",
+          "const": "BRL"
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ],
+      "dependentRequired": {
+        "debited_amount_cents": [
+          "currency"
+        ],
+        "currency": [
+          "debited_amount_cents"
+        ]
+      }
+    },
+    "BalanceHoldCreatedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "account"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^co_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "BalanceHoldReleasedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "account"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^co_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "StatementCreatedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "statement"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^st_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        },
+        "amount_cents": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "currency": {
+          "type": "string",
+          "const": "BRL"
+        },
+        "statement_type": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "reference_type": {
+          "type": "integer",
+          "enum": [
+            1,
+            2,
+            3
+          ]
+        },
+        "reference_id": {
+          "type": "string",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^ch_[A-Za-z0-9]+$"
+            },
+            {
+              "type": "string",
+              "pattern": "^(?:dp_[A-Za-z0-9]+|med_[1-9][0-9]*)$"
+            },
+            {
+              "type": "string",
+              "pattern": "^wd_[A-Za-z0-9]+$"
+            }
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ],
+      "dependentRequired": {
+        "amount_cents": [
+          "currency"
+        ],
+        "currency": [
+          "amount_cents"
+        ],
+        "reference_type": [
+          "reference_id"
+        ],
+        "reference_id": [
+          "reference_type"
+        ]
+      }
+    },
+    "TedReceivedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "statement"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^st_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "PixRefundReceivedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "statement"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^st_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "PixAvailableWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "PixIssuanceFailedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "BoletoAvailableWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "BoletoIssuanceFailedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "BoletoCompensatedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "PaymentLinkCreatedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "payment_link"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "PaymentLinkUpdatedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "payment_link"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^pl_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "RefundAcceptedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "refund"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^rf_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        },
+        "charge_id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "amount_cents": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1
+        },
+        "currency": {
+          "type": "string",
+          "const": "BRL"
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ],
+      "dependentRequired": {
+        "amount_cents": [
+          "currency"
+        ],
+        "currency": [
+          "amount_cents"
+        ]
+      }
+    },
+    "AccountRestoredWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "account"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^co_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "CustomerCreatedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "customer"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^cus_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "CustomerUpdatedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "customer"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^cus_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "CustomerDeletedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "customer"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^cus_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "WithdrawalAcceptedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "withdrawal"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^wd_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "ChargeFullyRefundedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "ChargePartiallyRefundedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "WithdrawalDestinationChangedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "account"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^co_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "BoletoOverpaymentReceivedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        },
+        "statement_id": {
+          "type": "string",
+          "pattern": "^st_[A-Za-z0-9]+$"
+        },
+        "credit_delta_cents": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1
+        },
+        "currency": {
+          "type": "string",
+          "const": "BRL"
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ],
+      "dependentRequired": {
+        "credit_delta_cents": [
+          "currency"
+        ],
+        "currency": [
+          "credit_delta_cents"
+        ]
+      }
+    },
+    "RefundReconciliationRequiredWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "refund"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^rf_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        },
+        "charge_id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "amount_cents": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1
+        },
+        "currency": {
+          "type": "string",
+          "const": "BRL"
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ],
+      "dependentRequired": {
+        "amount_cents": [
+          "currency"
+        ],
+        "currency": [
+          "amount_cents"
+        ]
+      }
+    },
+    "BoletoPartialSettlementDetectedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "WithdrawalAutomaticSettingsChangedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "account"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^co_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id"
+      ]
+    },
+    "ChargePaymentInstructionsAvailableWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id",
+        "payment_method"
+      ]
+    },
+    "ChargePaymentInstructionsFailedWebhookEventData": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "const": "charge"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^ch_[A-Za-z0-9]+$"
+        },
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "pix",
+            "boleto",
+            "credit_card",
+            "debit"
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "id",
+        "payment_method"
+      ]
     }
   }
 }

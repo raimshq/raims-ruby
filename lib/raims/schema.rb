@@ -24,7 +24,15 @@ module Raims
     def validate(value, schema, response = nil, depth = 0)
       fail_response(response) if depth > 100
       schema = resolve(schema, response)
-      variants = schema['anyOf'] || schema['oneOf']
+      if schema.key?('oneOf')
+        fail_response(response) unless value.is_a?(String)
+        matches = schema.fetch('oneOf').count do |branch|
+          Regexp.new("\\A(?:#{branch.fetch('pattern')})\\z").match?(value)
+        end
+        fail_response(response) unless matches == 1
+        return
+      end
+      variants = schema['anyOf']
       if variants
         matched = variants.any? do |variant|
           begin
@@ -48,6 +56,9 @@ module Raims
       when 'object', nil
         if kind == 'object' || schema.key?('properties')
           fail_response(response) unless value.is_a?(Hash) && schema.fetch('required', []).all? { |key| value.key?(key) }
+          schema.fetch('dependentRequired', {}).each do |key, required|
+            fail_response(response) if value.key?(key) && required.any? { |field| !value.key?(field) }
+          end
           additional = schema['additionalProperties']
           value.each do |key, child|
             child_schema = schema.fetch('properties', {})[key] || (additional.is_a?(Hash) ? additional : {})
@@ -73,7 +84,8 @@ module Raims
       fail_response(response) if depth > 100
       model = schema.fetch('$ref', '').split('/').last
       resolved = resolve(schema, response)
-      variants = resolved['anyOf'] || resolved['oneOf']
+      validate(value, resolved, response, depth) if resolved.key?('oneOf')
+      variants = resolved['anyOf']
       if variants
         variants.each do |variant|
           begin

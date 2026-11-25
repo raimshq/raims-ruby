@@ -72,6 +72,7 @@ VERBS = {"get", "post", "put", "patch", "delete", "head", "options", "trace"}
 
 
 SCHEMA_KEYS = {
+    "dependentRequired", "x-raims-webhook-event-environments",
     "$ref", "type", "format", "properties", "required", "items",
     "additionalProperties", "minimum", "maximum", "exclusiveMinimum",
     "exclusiveMaximum", "minLength", "maxLength", "minItems", "maxItems",
@@ -130,8 +131,24 @@ def resolve(spec, value):
 def compact(schema):
     if not isinstance(schema, dict):
         raise TypeError("Every schema must be an object.")
-    if "allOf" in schema or "oneOf" in schema:
-        raise ValueError("allOf and oneOf schemas are not supported by response hydration.")
+    if "allOf" in schema:
+        raise ValueError("allOf schemas are not supported by response hydration.")
+    if "oneOf" in schema:
+        variants = schema["oneOf"]
+        if (set(schema) - {"oneOf"} - DOCUMENTATION_KEYS or not isinstance(variants, list) or len(variants) < 2
+                or any(not isinstance(part, dict) or set(part) != {"type", "pattern"}
+                       or part["type"] != "string" or not isinstance(part["pattern"], str) for part in variants)):
+            raise ValueError("Only patterned string oneOf schemas are supported.")
+        for part in variants:
+            re.compile(part["pattern"])
+    if "dependentRequired" in schema:
+        properties = schema.get("properties", {})
+        dependencies = schema["dependentRequired"]
+        if (not object_type(schema) or not isinstance(dependencies, dict)
+                or any(name not in properties or not isinstance(required, list)
+                       or any(not isinstance(field, str) or field not in properties for field in required)
+                       or len(required) != len(set(required)) for name, required in dependencies.items())):
+            raise ValueError("Invalid dependentRequired object properties.")
     if "anyOf" in schema:
         variants = schema["anyOf"]
         if not isinstance(variants, list) or len(variants) != 2 or not all(isinstance(part, dict) for part in variants) or sum(part.get("type") == "null" for part in variants) != 1:
@@ -142,7 +159,7 @@ def compact(schema):
     unknown = set(schema) - SCHEMA_KEYS - DOCUMENTATION_KEYS
     if unknown:
         raise ValueError("Unsupported schema keywords: " + ", ".join(sorted(unknown)))
-    result = {}
+    result = {"type": "string"} if "oneOf" in schema else {}
     for key, value in schema.items():
         if key not in SCHEMA_KEYS:
             continue
@@ -323,6 +340,19 @@ def collect_operations(spec, source, schemas):
     if len(operations) != source["operations"] or spec["info"]["version"] != source["api_version"]:
         raise ValueError("The operation count or API version differs from source.json.")
     return operations, reachable(input_roots, schemas), reachable(response_roots, schemas)
+
+
+LEGACY_WEBHOOK_CODES = (
+    "boleto.available", "boleto.issuance_failed", "pix.available", "pix.issuance_failed",
+)
+
+
+def legacy_webhook_constants(constants):
+    for prefix in ("CREATE_WEBHOOK_REQUEST_EVENTS_ITEM_", "WEBHOOK_EVENT_TYPE_CODE_"):
+        for value in LEGACY_WEBHOOK_CODES:
+            symbol = prefix + re.sub(r"[^A-Z0-9]+", "_", value.upper())
+            if symbol not in constants:
+                yield symbol, value
 
 
 def enum_constants(schemas):
@@ -579,7 +609,12 @@ def expected_outputs():
     validate_generated_names(services, operations, schemas, responses)
     constants = enum_constants(schemas)
     metadata = {"source": source, "services": services, "operations": operations, "schemas": schemas}
-    enum_lines = [HEADER, "module Raims", "  module EnumValues"] + ["    " + name + " = " + ruby_literal(value) for name, value in sorted(constants.items())] + ["  end", "end"]
+    enum_lines = [HEADER, "module Raims", "  module EnumValues"]
+    enum_lines.extend("    " + name + " = " + ruby_literal(value) for name, value in sorted(constants.items()))
+    enum_lines.extend(["", "    # Deprecated codes for historical webhook records only."])
+    for name, value in legacy_webhook_constants(constants):
+        enum_lines.extend(["    " + name + " = " + ruby_literal(value), "    deprecate_constant :" + name])
+    enum_lines.extend(["  end", "end"])
     return {
         "lib/raims/generated/contract.json": json.dumps(metadata, ensure_ascii=False, indent=2) + "\n",
         "lib/raims/models.rb": generate_models(schemas, responses),
