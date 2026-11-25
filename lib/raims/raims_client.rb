@@ -15,7 +15,7 @@ module Raims
 
     attr_reader :accounts, :balances, :charges, :customers, :disputes, :payment_links,
                 :refunds, :statements, :withdrawals, :withdrawal_destinations,
-                :webhooks, :webhook_event_types, :simulations
+                :webhooks, :webhook_deliveries, :webhook_events, :webhook_event_types, :simulations
 
     def initialize(api_key, api_base: 'https://api.raims.com', timeout: 80, connect_timeout: 10,
                    max_network_retries: 0, http_client: nil, request_observer: nil)

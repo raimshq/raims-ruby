@@ -291,6 +291,78 @@ module Raims
     end
   end
 
+  class WebhookDeliveriesService
+    def initialize(client)
+      @client = client
+    end
+
+    # List webhook deliveries.
+    # @return [Raims::ApiList]
+    def list(params = {}, options = {})
+      @client.request('ListWebhookDeliveries', path_params: {}, params: params, options: options)
+    end
+
+    # Retrieve a delivery.
+    # @return [Raims::WebhookDelivery]
+    def retrieve(delivery_id, params = {}, options = {})
+      @client.request('GetWebhookDelivery', path_params: {'delivery_id' => delivery_id}, params: params, options: options)
+    end
+
+    # List the attempts for a delivery.
+    # @return [Raims::ApiList]
+    def list_attempts(delivery_id, params = {}, options = {})
+      @client.request('ListWebhookDeliveryAttempts', path_params: {'delivery_id' => delivery_id}, params: params, options: options)
+    end
+
+    # Retrieve an attempt.
+    # @return [Raims::WebhookAttemptDetail]
+    def retrieve_attempt(delivery_id, attempt_id, params = {}, options = {})
+      @client.request('GetWebhookDeliveryAttempt', path_params: {'delivery_id' => delivery_id, 'attempt_id' => attempt_id}, params: params, options: options)
+    end
+
+    # Resend an event.
+    # @return [Raims::WebhookDeliveryResendAccepted]
+    def resend(delivery_id, params = {}, options = {})
+      @client.request('ResendWebhookDelivery', path_params: {'delivery_id' => delivery_id}, params: params, options: options)
+    end
+
+    # Resend multiple deliveries.
+    # @return [Raims::WebhookBulkResendAccepted]
+    def resend_many(params = {}, options = {})
+      @client.request('ResendWebhookDeliveries', path_params: {}, params: params, options: options)
+    end
+
+    # Advance the next attempt.
+    # @return [Raims::WebhookAdvanceAccepted]
+    def advance(delivery_id, params = {}, options = {})
+      @client.request('AdvanceWebhookDelivery', path_params: {'delivery_id' => delivery_id}, params: params, options: options)
+    end
+  end
+
+  class WebhookEventsService
+    def initialize(client)
+      @client = client
+    end
+
+    # List webhook events.
+    # @return [Raims::ApiList]
+    def list(params = {}, options = {})
+      @client.request('ListWebhookEvents', path_params: {}, params: params, options: options)
+    end
+
+    # Retrieve a webhook event.
+    # @return [Raims::WebhookEventDetail]
+    def retrieve(event_id, params = {}, options = {})
+      @client.request('GetWebhookEvent', path_params: {'event_id' => event_id}, params: params, options: options)
+    end
+
+    # Send an event to a webhook.
+    # @return [Raims::WebhookDeliveryResendAccepted]
+    def deliver(event_id, params = {}, options = {})
+      @client.request('DeliverWebhookEvent', path_params: {'event_id' => event_id}, params: params, options: options)
+    end
+  end
+
   class WebhookEventTypesService
     def initialize(client)
       @client = client
