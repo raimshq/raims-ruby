@@ -218,11 +218,12 @@ def release_files(value, files, create_missing=False):
             require(public_download(assets[name]['browser_download_url']) == raw, 'An existing release asset differs from approved CI bytes.')
     missing = set(complete) - set(assets)
     require(not missing or create_missing, 'The approved gem assets are missing from the release.')
+    if not missing:
+        return
     for name in sorted(missing):
         upload_release_asset(value['releaseId'], name, complete[name])
-    if missing:
-        rows = github('releases/' + str(value['releaseId'])).get('assets', [])
-        assets = {asset['name']: asset for asset in rows}
+    rows = github('releases/' + str(value['releaseId'])).get('assets', [])
+    assets = {asset['name']: asset for asset in rows}
     require(len(assets) == len(rows) and set(assets) == expected, 'The release asset inventory differs.')
     for name, raw in complete.items():
         require(public_download(assets[name]['browser_download_url']) == raw, 'A public release asset differs.')
